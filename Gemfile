@@ -6,6 +6,8 @@ gemspec
 gem 'nokogiri'
 gem 'rest-client'
 gem 'json'
+gem 'procto'
+gem 'activesupport'
 
 platforms :jruby do
   gem 'json-jruby'
