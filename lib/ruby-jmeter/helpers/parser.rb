@@ -73,8 +73,8 @@ module RubyJmeter
       }
 
       params[:update_at_xpath] << {
-        :xpath => '//collectionProp',
-        :value => Nokogiri::XML(<<-EOF.strip_heredoc).children
+        xpath: '//collectionProp',
+        value: Nokogiri::XML(<<-EOF.strip_heredoc).children
           <elementProp name="" elementType="HTTPArgument">
             <boolProp name="HTTPArgument.always_encode">false</boolProp>
             <stringProp name="Argument.value">#{params[:raw_body].encode(:xml => :text)}</stringProp>
@@ -89,46 +89,23 @@ module RubyJmeter
       files = params.delete(:files)
       return if files.empty?
       x = Nokogiri::XML::Builder.new do |b|
-        b.elementProp(name: "HTTPsampler.Files", elementType: "HTTPFileArgs") {
-          b.collectionProp(name: "HTTPFileArgs.files") {
+        b.elementProp(name: "HTTPsampler.Files", elementType: "HTTPFileArgs") do
+          b.collectionProp(name: "HTTPFileArgs.files") do
             files.each do |f|
-              b.elementProp(name: f[:path], elementType: "HTTPFileArg") {
-                b.stringProp f[:path] || '' , name: "File.path"
-                b.stringProp f[:paramname] || '' , name: "File.paramname"
-                b.stringProp f[:mimetype] || '' , name: "File.mimetype"
-              }
+              b.elementProp(name: f[:path], elementType: "HTTPFileArg") do
+                b.stringProp f[:path] || '', name: "File.path"
+                b.stringProp f[:paramname] || '', name: "File.paramname"
+                b.stringProp f[:mimetype] || '', name: "File.mimetype"
+              end
             end
-          }
-        }
+          end
+        end
       end
       params[:update_at_xpath] ||= []
       params[:update_at_xpath] << {
         :xpath => '//HTTPSamplerProxy',
         :value => x.doc.root
       }
-    end
-
-    def parse_test_type(params)
-      case params.keys.first.to_s
-      when 'contains'
-        2
-      when 'not-contains'
-        6
-      when 'matches'
-        1
-      when 'not-matches'
-        5
-      when 'equals'
-        8
-      when 'not-equals'
-        12
-      when 'substring'
-        16
-      when 'not-substring'
-        20
-      else
-        2
-      end
     end
 
   end
