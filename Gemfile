@@ -14,7 +14,7 @@ platforms :jruby do
 end
 
 group :development do
-  gem 'pry', :require => 'pry'
+  gem 'pry', require: 'pry'
 end
 
 group :test do
