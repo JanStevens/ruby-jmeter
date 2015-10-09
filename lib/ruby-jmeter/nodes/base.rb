@@ -2,15 +2,13 @@ module RubyJmeter
   module Nodes
     class Base
       include Procto.call
-      include Helper
       include RubyJmeter::Nodes::Partials::Basic
 
       attr_reader :params, :doc
 
       def initialize(params = {})
         @params = params.reverse_merge!(default_params)
-        validate_params
-        convert_param_keys
+        convert_param_keys unless self.class.new_syntax?
         @doc = nil
       end
 
@@ -20,8 +18,10 @@ module RubyJmeter
 
       def call
         @doc = node
-        params.except!(*exclude_in_xml)
-        AssignParamsInNode.call(params, @doc)
+        unless self.class.new_syntax?
+          params.except!(*exclude_in_xml)
+          AssignParamsInNode.call(params, @doc)
+        end
         @doc
       end
 
@@ -31,12 +31,6 @@ module RubyJmeter
 
       def exclude_in_xml
         []
-      end
-
-      def validate_params
-        if self.class.allowed_params.present?
-          params.assert_valid_keys(*allowed_params)
-        end
       end
 
       def convert_param_keys
@@ -86,12 +80,12 @@ module RubyJmeter
 
         # @DSL
         def defaults(params = {})
-          @default_params = params.reverse_merge(name: self.to_s.demodulize)
+          @default_params = params.reverse_merge(test_name: self.to_s.demodulize, enabled: true)
         end
 
         # @DSL
         def allowed(params = [])
-          @allowed_params = (Array(params) + %i(update_at_xpath name enabled)).uniq
+          @allowed_params = (Array(params) + %i(update_at_xpath test_name enabled)).uniq
         end
 
         def mapping(params = {})
@@ -100,6 +94,14 @@ module RubyJmeter
 
         def skip_conversion!
           @skip_conversion = true
+        end
+
+        def uses_new_syntax!
+          @new_syntax = true
+        end
+
+        def new_syntax?
+          @new_syntax
         end
 
         def convert?

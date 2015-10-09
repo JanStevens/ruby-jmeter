@@ -47,8 +47,8 @@ module RubyJmeter
         each_with_object(params[:update_at_xpath]) do |(name, values), memo|
            Array(values).each do |value|
             memo << {
-              :xpath => '//collectionProp',
-              :value => Nokogiri::XML(<<-EOF.strip_heredoc).children
+              xpath: '//collectionProp',
+              value: Nokogiri::XML(<<-EOF.strip_heredoc).children
                 <elementProp name="#{name}" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">#{params[:always_encode] ? 'true' : false}</boolProp>
                   <stringProp name="Argument.value">#{value}</stringProp>
@@ -66,8 +66,8 @@ module RubyJmeter
     def raw_body(params)
       params[:update_at_xpath] ||= []
       params[:update_at_xpath] << {
-        :xpath => '//HTTPSamplerProxy',
-        :value => Nokogiri::XML(<<-EOF.strip_heredoc).children
+        xpath: '//HTTPSamplerProxy',
+        value: Nokogiri::XML(<<-EOF.strip_heredoc).children
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           EOF
       }
@@ -103,8 +103,8 @@ module RubyJmeter
       end
       params[:update_at_xpath] ||= []
       params[:update_at_xpath] << {
-        :xpath => '//HTTPSamplerProxy',
-        :value => x.doc.root
+        xpath: '//HTTPSamplerProxy',
+        value: x.doc.root
       }
     end
 

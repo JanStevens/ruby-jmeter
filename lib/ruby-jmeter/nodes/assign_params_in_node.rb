@@ -25,12 +25,13 @@ module RubyJmeter
 
       def enable_or_disable_node
         return unless params.is_a?(Hash)
-        doc.children.first.attributes['enabled'].value = params[:enabled].to_s.empty? ? 'true' : 'false'
+        doc.children.first.attributes['enabled'].value = params[:enabled].to_s == 'true' ? 'true' : 'false'
       end
 
       def set_node_name
-        doc.children.first.attributes['testname'].value = params[:name]
-        params.delete(:name)
+        doc.children.first.attributes['testname'].value = params[:test_name] || params[:testName]
+        params.delete(:test_name)
+        params.delete(:testName)
       end
 
       def update_array_collection

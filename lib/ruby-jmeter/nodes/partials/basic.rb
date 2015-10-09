@@ -15,6 +15,10 @@ module RubyJmeter
         def collection(xml, attributes = {}, &block)
           xml.collectionProp(attributes, &block)
         end
+
+        def obj_prop(xml, attributes = {})
+          RubyJmeter::Nodes::Partials::ObjProp.call(xml, attributes)
+        end
       end
     end
   end

@@ -3,16 +3,24 @@ module RubyJmeter
     module Listeners
       class ViewResultsTree < Nodes::Base
         defaults error_logging: false
-        allowed %i(error_logging filename config)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="" enabled="true">
-            <boolProp name="ResultCollector.error_logging" />
-            #{RubyJmeter::Nodes::Partials::ObjProp.call(params[:config]) }
-            <stringProp name="filename"/>
-          </ResultCollector>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            root_node(xml) do
+              bool(xml, attributes[:error_logging], name: 'ResultCollector.error_logging')
+              obj_prop(xml, attributes[:config])
+              string(xml, attributes[:file], name: 'filename')
+            end
+          end.doc
+        end
+
+        def root_node(xml, &block)
+          xml.ResultCollector(guiclass: 'ViewResultsFullVisualizer',
+            testclass: 'ResultCollector',
+            testname: attributes[:test_name],
+            enabled: attributes[:enabled],
+            &block)
         end
       end
     end

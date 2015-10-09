@@ -1,44 +1,45 @@
 module RubyJmeter
   module Nodes
-    # @TODO Arguments.arguments collectionProp
+    # user_variables: [ name: 'value', name_2: 'value_2' ]
     class TestPlan < Nodes::Base
       defaults functional_mode: false, serialize_threadgroups: false
-      allowed %i(comments functional_mode serialize_threadgroups user_defined_variables user_define_classpath)
-      skip_conversion!
+      uses_new_syntax!
 
       def node
-        Nokogiri::XML(<<-XML.strip_heredoc)
-        <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="" enabled="true">
-          <stringProp name="TestPlan.comments"/>
-          <boolProp name="TestPlan.functional_mode" />
-          <boolProp name="TestPlan.serialize_threadgroups" />
-          <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="" enabled="true">
-            #{Partials::CollectionProp.call(xml_template, params[:user_defined_variables])}
-          </elementProp>
-          <stringProp name="TestPlan.user_define_classpath"/>
-        </TestPlan>
-        XML
+        Nokogiri::XML::Builder.new do |xml|
+          root_node(xml) do
+            string(xml, attributes[:comments], name: 'TestPlan.comments')
+            bool(xml, attributes[:functional_mode], name: 'TestPlan.functional_mode')
+            bool(xml, attributes[:serialize_threadgroups], name: 'TestPlan.serialize_threadgroups')
+            user_defined_variables(xml) do
+              collection(xml, name: 'Arguments.arguments') do
+                Array(attributes[:user_variables]).each do |name, value|
+                  element(xml, name: name, elementType: 'Argument') do
+                    string(xml, name, name: 'Argument.name')
+                    string(xml, value, name: 'Argument.value')
+                    string(xml, '=', name: 'Argument.metadata')
+                  end
+                end
+              end
+            end
+            string(xml, attributes[:class_path], name: 'TestPlan.user_defined_classpath')
+          end
+        end.doc
       end
 
-      def exclude_in_xml
-        %i(user_defined_variables)
+      def user_defined_variables(xml, &block)
+        element(xml, name: "TestPlan.user_defined_variables",
+          elementType: "Arguments",
+          guiclass: "ArgumentsPanel",
+          testclass: "Arguments",
+          enabled: "true", &block)
       end
 
-      def xml_template
-        {
-          collection: {
-            name: 'Arguments.arguments'
-          },
-          element: {
-            name: nil,
-            elementType: 'Argument',
-            attributes: [
-              { key: :name, type: 'stringProp', name: 'Argument.name' },
-              { key: :value, type: 'stringProp', name: 'Argument.value' },
-              { key: :metadata, type: 'stringProp', name: 'Argument.metadata', value: '=' },
-            ]
-          }
-        }
+      def root_node(xml, &block)
+        xml.TestPlan(guiclass: 'TestPlanGui',
+          testclass: 'TestPlan',
+          testname: attributes[:test_name],
+          enabled: attributes[:enabled], &block)
       end
     end
   end

@@ -58,6 +58,8 @@ module RubyJmeter
     alias_method :ldap_extended, :ldap_extended_request
     alias_method :assert, :response_assertion
 
+    alias_method :extract_json, :json_path_extractor
+
     def extract(params, &block)
       node = if params[:regex]
                params[:refname] = params[:name]
@@ -69,8 +71,6 @@ module RubyJmeter
                params[:xpathQuery] = params[:xpath]
                RubyJmeter::Nodes::PostProcessors::XpathExtractor.call(params)
              elsif params[:json]
-               params[:VAR] = params[:name]
-               params[:JSONPATH] = params[:json]
                RubyJmeter::Nodes::Plugins::JsonPathExtractor.call(params)
              elsif params[:css]
                params[:refname] = params[:name]
@@ -168,13 +168,7 @@ module RubyJmeter
     end
 
     def logger
-      @log ||= Logger.new(STDOUT)
-      @log.level = Logger::DEBUG
-      @log
+      RubyJmeter.logger
     end
   end
-end
-
-def test(params = {}, &block)
-  RubyJmeter.dsl_eval(RubyJmeter::ExtendedDSL.new(params), &block)
 end

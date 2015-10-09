@@ -2,8 +2,11 @@ module RubyJmeter
   module Nodes
     module Samplers
       class DebugSampler < Nodes::Base
-        defaults displayJMeterProperties: false, displayJMeterVariables: true, displaySystemProperties: false
-        allowed %i(displayJMeterProperties displayJMeterVariables displaySystemProperties)
+        defaults properties: false, variables: true, system: true
+        allowed %i(properties variables system)
+        mapping properties: :displayJMeterProperties, variables: :displayJMeterVariables, system: :displaySystemProperties
+
+        skip_conversion!
 
         def node
           Nokogiri::XML(<<-XML.strip_heredoc)

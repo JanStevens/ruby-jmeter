@@ -3,7 +3,7 @@ module RubyJmeter
     module Partials
       class ObjProp
         include Procto.call
-        attr_reader :config
+        attr_reader :config, :xml
 
         CONFIG_ATTRIBUTES = {
           time: true,
@@ -32,21 +32,20 @@ module RubyJmeter
           sample_count: true
         }
 
-        def initialize(config = {})
+        def initialize(xml, config = {})
+          @xml = xml
           @config = (config || {}).reverse_merge(CONFIG_ATTRIBUTES)
         end
 
         def call
-          Nokogiri::XML::Builder.new do |xml|
-            xml.objProp do
-              xml.name 'saveConfig'
-              xml.value class: 'SampleSaveConfiguration' do
-                config.each do |key, value|
-                  xml.send(key.to_s.camelize(:lower).to_sym, value)
-                end
+          xml.objProp do
+            xml.name 'saveConfig'
+            xml.value class: 'SampleSaveConfiguration' do
+              config.each do |key, value|
+                xml.send(key.to_s.camelize(:lower).to_sym, value)
               end
             end
-          end.doc.root.to_xml
+          end
         end
       end
     end
