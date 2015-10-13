@@ -3,43 +3,23 @@ module RubyJmeter
     module Listeners
       class SimpleDataWriter < Nodes::Base
         defaults error_logging: false
-        allowed %i(error_logging filename)
+        uses_new_syntax!
+
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <ResultCollector guiclass="SimpleDataWriter" testclass="ResultCollector" testname="" enabled="true">
-            <boolProp name="ResultCollector.error_logging" />
-            <objProp>
-              <name>saveConfig</name>
-              <value class="SampleSaveConfiguration">
-                <time>true</time>
-                <latency>true</latency>
-                <timestamp>true</timestamp>
-                <success>true</success>
-                <label>true</label>
-                <code>true</code>
-                <message>true</message>
-                <threadName>true</threadName>
-                <dataType>false</dataType>
-                <encoding>false</encoding>
-                <assertions>false</assertions>
-                <subresults>false</subresults>
-                <responseData>false</responseData>
-                <samplerData>false</samplerData>
-                <xml>true</xml>
-                <fieldNames>false</fieldNames>
-                <responseHeaders>true</responseHeaders>
-                <requestHeaders>false</requestHeaders>
-                <responseDataOnError>false</responseDataOnError>
-                <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-                <assertionsResultsToSave>0</assertionsResultsToSave>
-                <bytes>true</bytes>
-                <threadCounts>true</threadCounts>
-                <sampleCount>true</sampleCount>
-              </value>
-            </objProp>
-            <stringProp name="filename"/>
-          </ResultCollector>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            root_node(xml) do
+              bool(xml, attributes[:error_logging], name: 'ResultCollector.error_logging')
+              obj_prop(xml, attributes[:config])
+              string(xml, attributes[:file], name: 'filename')
+            end
+          end.doc
+        end
+
+        def root_node(xml, &block)
+          xml.ResultCollector(guiclass: "SimpleDataWriter",
+            testclass: "ResultCollector",
+            testname: attributes[:test_name],
+            enabled: attributes[:enabled], &block)
         end
       end
     end

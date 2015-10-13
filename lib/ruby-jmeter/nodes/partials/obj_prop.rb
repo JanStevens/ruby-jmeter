@@ -29,8 +29,11 @@ module RubyJmeter
           assertions_results_to_save: 0,
           bytes: true,
           url: true,
+          hostname: true,
           thread_counts: true,
-          sample_count: true
+          sample_count: true,
+          idle_time: true,
+          connect_time: true
         }
 
         def initialize(xml, config = {})
