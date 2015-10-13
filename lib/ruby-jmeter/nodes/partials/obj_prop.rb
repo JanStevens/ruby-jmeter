@@ -28,6 +28,7 @@ module RubyJmeter
           save_assertion_results_failure_message: false,
           assertions_results_to_save: 0,
           bytes: true,
+          url: true,
           thread_counts: true,
           sample_count: true
         }

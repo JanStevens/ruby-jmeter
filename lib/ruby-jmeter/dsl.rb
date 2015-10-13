@@ -9,14 +9,14 @@ module RubyJmeter
 
     attr_accessor :root
 
-    def initialize(params = {})
+    def initialize(params = {}, saved_binding)
       @root = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
         xml.jmeterTestPlan(version: '1.2', properties: '2.8', jmeter: '2.13', 'ruby-jmeter' => '2.13.0') do
           xml.hashTree
         end
       end.doc
       node = RubyJmeter::Nodes::TestPlan.call(params)
-
+      @saved_binding = saved_binding
       @current_node = @root.at_xpath('//jmeterTestPlan/hashTree')
       @current_node = attach_to_last(node)
     end
@@ -144,7 +144,9 @@ module RubyJmeter
       ht = attach_to_last(node)
       previous = @current_node
       @current_node = ht
-      instance_exec(&block) if block
+      if block
+        Combinder.new(self, @saved_binding).instance_eval(&block)
+      end
       @current_node = previous
     end
 

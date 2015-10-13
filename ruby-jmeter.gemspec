@@ -15,12 +15,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency("nokogiri")
   gem.add_dependency("procto")
   gem.add_dependency("activesupport")
-  gem.add_runtime_dependency('json-jruby') if RUBY_PLATFORM == 'java'
 
   gem.files         = `git ls-files`.split($/)
-  gem.executables   << 'flood'
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.require_paths = ['lib']
-
   gem.license       = 'MIT'
 end

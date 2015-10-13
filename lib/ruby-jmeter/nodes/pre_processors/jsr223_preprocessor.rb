@@ -2,7 +2,7 @@ module RubyJmeter
   module Nodes
     module PreProcessors
       class Jsr223Preprocessor < Nodes::Base
-        allowed %i(cacheKey filename parameters script scriptLanguage)
+        allowed %i(cacheKey filename parameters script script_language)
 
         def node
           Nokogiri::XML(<<-XML.strip_heredoc)
