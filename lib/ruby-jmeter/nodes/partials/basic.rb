@@ -2,7 +2,7 @@ module RubyJmeter
   module Nodes
     module Partials
       module Basic
-        %i(string int long bool).each do |method|
+        %i(string int long bool double).each do |method|
           define_method method do |xml, value = nil, attributes = {}, &block|
             xml.send("#{method}Prop", value, attributes, &block)
           end

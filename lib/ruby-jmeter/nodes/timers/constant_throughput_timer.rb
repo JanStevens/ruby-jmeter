@@ -2,14 +2,14 @@ module RubyJmeter
   module Nodes
     module Times
       class ConstantThroughputTimer < Nodes::Base
-        allowed %i(calcMode value)
-        defaults calcMode: 0, value: 0.0
+        defaults mode: 0, value: 0.0
+        uses_new_syntax!
 
         def node
           Nokogiri::XML::Builder.new do |xml|
             xml.ConstantThroughputTimer(guiclass: 'TestBeanGUI', testclass: 'ConstantThroughputTimer', testname: params[:name], enabled: true) do
               int xml, convert_calcmode, name: 'calcMode'
-              double xml do
+              double(xml) do
                 xml.name 'throughput'
                 xml.value params[:value]
                 xml.savedValue params[:value]
@@ -19,7 +19,7 @@ module RubyJmeter
         end
 
         def convert_calcmode
-          calc_mode = params[:calcMode]
+          calc_mode = params[:mode]
           case calc_mode
             when :this_thread then
               0
