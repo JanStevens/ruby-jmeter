@@ -7,7 +7,8 @@ module RubyJmeter
 
         def node
           Nokogiri::XML::Builder.new do |xml|
-            xml.ConstantThroughputTimer(guiclass: 'TestBeanGUI', testclass: 'ConstantThroughputTimer', testname: params[:name], enabled: true) do
+            xml.ConstantThroughputTimer(guiclass: 'TestBeanGUI', testclass: 'ConstantThroughputTimer',
+              testname: params[:test_name], enabled: params[:enabled]) do
               int xml, convert_calcmode, name: 'calcMode'
               double(xml) do
                 xml.name 'throughput'
