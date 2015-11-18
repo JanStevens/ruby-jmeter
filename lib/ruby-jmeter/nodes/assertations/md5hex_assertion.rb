@@ -2,14 +2,15 @@ module RubyJmeter
   module Nodes
     module Listeners
       class Md5hexAssertion < Nodes::Base
-        allowed %i(size)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <MD5HexAssertion guiclass="MD5HexAssertionGUI" testclass="MD5HexAssertion" testname="" enabled="true">
-            <stringProp name="MD5HexAssertion.size"/>
-          </MD5HexAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.MD5HexAssertion guiclass: "MD5HexAssertionGUI", testclass: "MD5HexAssertion",
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              string(xml, attributes[:size], name: 'MD5HexAssertion.size')
+            end
+          end.doc
         end
       end
     end

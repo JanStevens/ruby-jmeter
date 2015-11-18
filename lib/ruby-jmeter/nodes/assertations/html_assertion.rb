@@ -3,21 +3,31 @@ module RubyJmeter
     module Assertations
       class HtmlAssertion < Nodes::Base
         defaults error_threshold: 0, warning_threshold: 0,
-          html_assertion_doctype: :omit, errors_only: false, html_assertion_format: 0
-        allowed %i(error_threshold warning_threshold html_assertion_doctype
-          errors_only html_assertion_format html_assertion_filename)
+          doctype: :omit, errors_only: false, format: :html
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <HTMLAssertion guiclass="HTMLAssertionGui" testclass="HTMLAssertion" testname="" enabled="true">
-            <longProp name="html_assertion_error_threshold" />
-            <longProp name="html_assertion_warning_threshold" />
-            <stringProp name="html_assertion_doctype" />
-            <boolProp name="html_assertion_errorsonly" />
-            <longProp name="html_assertion_format" />
-            <stringProp name="html_assertion_filename"/>
-          </HTMLAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.HTMLAssertion guiclass: 'HTMLAssertionGui', testclass: 'HTMLAssertion',
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              long(xml, attributes[:error_threshold], name: 'html_assertion_error_threshold')
+              long(xml, attributes[:warning_threshold], name: 'html_assertion_warning_threshold')
+              string(xml, attributes[:doctype], name: 'html_assertion_doctype')
+              bool(xml, attributes[:errors_only], name: 'html_assertion_errorsonly')
+              long(xml, convert_format(attributes[:format]), name: 'html_assertion_format')
+              string(xml, attributes[:filename], name: 'html_assertion_filename')
+            end
+          end.doc
+        end
+
+        def convert_format(format)
+          if format == :html
+            0
+          elsif format == :xhtml
+            1
+          else
+            2
+          end
         end
       end
     end

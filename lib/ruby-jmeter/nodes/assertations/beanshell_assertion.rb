@@ -3,17 +3,17 @@ module RubyJmeter
     module Assertations
       class BeanshellAssertion < Nodes::Base
         defaults reset_interpreter: false
-        allowed %i(query filename parameters reset_interpreter)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="" enabled="true">
-            <stringProp name="BeanShellAssertion.query"/>
-            <stringProp name="BeanShellAssertion.filename"/>
-            <stringProp name="BeanShellAssertion.parameters"/>
-            <boolProp name="BeanShellAssertion.resetInterpreter" />
-          </BeanShellAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.BeanShellAssertion guiclass: 'BeanShellAssertionGui', testclass: 'BeanShellAssertion', testname: attributes[:test_name], enabled: attributes[:enabled] do
+              string(xml, attributes[:query], name: 'BeanShellAssertion.query')
+              string(xml, attributes[:filename], name: 'BeanShellAssertion.filename')
+              string(xml, attributes[:parameters], name: 'BeanShellAssertion.parameters')
+              string(xml, attributes[:reset_interpreter], name: 'BeanShellAssertion.resetInterpreter')
+            end
+          end.doc
         end
       end
     end

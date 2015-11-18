@@ -2,14 +2,16 @@ module RubyJmeter
   module Nodes
     module Assertations
       class DurationAssertion < Nodes::Base
-        allowed %i(duration)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="" enabled="true">
-            <stringProp name="DurationAssertion.duration"/>
-          </DurationAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.DurationAssertion guiclass: 'DurationAssertionGui', testclass: 'DurationAssertion',
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              string(xml, attributes[:duration], name: 'DurationAssertion.duration')
+              string(xml, attributes[:scope], name: 'Assertion.scope')
+            end
+          end.doc
         end
       end
     end

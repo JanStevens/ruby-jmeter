@@ -2,14 +2,15 @@ module RubyJmeter
   module Nodes
     module Listeners
       class XmlSchemaAssertion < Nodes::Base
-        allowed %i(xmlschema_assertation_filename)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-        <XMLSchemaAssertion guiclass="XMLSchemaAssertionGUI" testclass="XMLSchemaAssertion" testname="" enabled="true">
-          <stringProp name="xmlschema_assertion_filename"/>
-        </XMLSchemaAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.XMLSchemaAssertion guiclass: "XMLSchemaAssertionGUI", testclass: "XMLSchemaAssertion",
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              string(xml, attributes[:filename], name: 'xmlschema_assertion_filename')
+            end
+          end.doc
         end
       end
     end

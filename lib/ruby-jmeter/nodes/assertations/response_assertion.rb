@@ -3,8 +3,7 @@ module RubyJmeter
     module Listeners
       class ResponseAssertion < Nodes::Base
         defaults test_field: 'Assertion.response_data_as_document', assume_success: false, scope: 'all'
-        #allowed %i(test_field assume_success test_type scope variable test_strings contains matches)
-        skip_conversion!
+        uses_new_syntax!
 
         def node
           test_type = convert_test_type(params.keys.first)
@@ -28,11 +27,6 @@ module RubyJmeter
               end
             end
           end.doc
-        end
-
-
-        def exclude_in_xml
-          %i(test_field assume_success test_type scope variable test_strings)
         end
 
         def convert_test_type(type)

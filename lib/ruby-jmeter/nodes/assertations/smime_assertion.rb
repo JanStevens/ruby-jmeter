@@ -2,28 +2,27 @@ module RubyJmeter
   module Nodes
     module Listeners
       class SmimeAssertion < Nodes::Base
+        uses_new_syntax!
         defaults verify_signature: false, not_signed: false, signer_no_check: false,
           signer_check_constraints: false, signer_check_by_file: false
-        allowed %i(verify_signature not_signed issuer_dn signer_dn signer_serial signer_email
-          signer_cert_file signer_no_check signer_check_constraints
-          signer_check_by_file message_position)
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <SMIMEAssertion guiclass="SMIMEAssertionGui" testclass="SMIMEAssertion" testname="" enabled="true">
-            <boolProp name="SMIMEAssert.verifySignature" />
-            <boolProp name="SMIMEAssert.notSigned" />
-            <stringProp name="SMIMEAssert.issuerDn" />
-            <stringProp name="SMIMEAssert.signerDn" />
-            <stringProp name="SMIMEAssert.signerSerial" />
-            <stringProp name="SMIMEAssert.signerEmail" />
-            <stringProp name="SMIMEAssert.signerCertFile" />
-            <boolProp name="SMIMEAssert.signerNoCheck" />
-            <boolProp name="SMIMEAssert.signerCheckConstraints" />
-            <boolProp name="SMIMEAssert.signerCheckByFile" />
-            <stringProp name="SMIMEAssert.messagePosition" />
-          </SMIMEAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.SMIMEAssertion guiclass: "SMIMEAssertionGui", testclass: "SMIMEAssertion",
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              bool(xml, attributes[:verify_signature], name: 'SMIMEAssert.verifySignature')
+              bool(xml, attributes[:not_signed], name: "SMIMEAssert.notSigned")
+              string(xml, attributes[:issuer_dn], name: "SMIMEAssert.issuerDn")
+              string(xml, attributes[:signer_dn], name: "SMIMEAssert.signerDn")
+              string(xml, attributes[:signer_serial], name: "SMIMEAssert.signerSerial")
+              string(xml, attributes[:signer_email], name: "SMIMEAssert.signerEmail")
+              string(xml, attributes[:signer_cert_file], name: "SMIMEAssert.signerCertFile")
+              bool(xml, attributes[:signer_no_check], name: "SMIMEAssert.signerNoCheck")
+              bool(xml, attributes[:signer_check_constraints], name: "SMIMEAssert.signerCheckConstraints")
+              bool(xml, attributes[:signer_check_by_file], name: "SMIMEAssert.signerCheckByFile")
+              string(xml, attributes[:message_position], name: "SMIMEAssert.messagePosition")
+            end
+          end.doc
         end
       end
     end

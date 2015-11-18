@@ -3,16 +3,24 @@ module RubyJmeter
     module Assertations
       class CompareAssertion < Nodes::Base
         defaults compare_time: -1, compare_content: true
-        allowed %i(compare_content compare_time strings_to_skip)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <CompareAssertion guiclass="TestBeanGUI" testclass="CompareAssertion" testname="" enabled="true">
-            <boolProp name="compareContent" />
-            <longProp name="compareTime" />
-            <collectionProp name="stringsToSkip"/>
-          </CompareAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.CompareAssertion guiclass: 'TestBeanGUI', testclass: 'CompareAssertion',
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              bool(xml, attributes[:compare_content], name: 'compareContent')
+              long(xml, attributes[:compare_time], name: 'compareTime')
+              collection(xml, name: 'stringsToSkip') do
+                Array(attributes[:strings_to_skip]).each do |skip|
+                  element(xml, elementType: 'SubstitutionElement') do
+                    string(xml, skip[:regex], name: 'regex')
+                    string(xml, skip[:substitute], name: 'substitute')
+                  end
+                end
+              end
+            end
+          end.doc
         end
       end
     end

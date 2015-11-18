@@ -2,17 +2,17 @@ module RubyJmeter
   module Nodes
     module Assertations
       class BsfAssertion < Nodes::Base
-        allowed %i(filename parameters script script_language)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-         <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="" enabled="true">
-          <stringProp name="filename"/>
-          <stringProp name="parameters"/>
-          <stringProp name="script"/>
-          <stringProp name="scriptLanguage"/>
-         </BSFAssertion>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.BSFAssertion guiclass: 'TestBeanGUI', testclass: 'BSFAssertion', testname: attributes[:test_name], enabled: attributes[:enabled] do
+              string(xml, attributes[:filename], name: 'filename')
+              string(xml, attributes[:parameters], name: 'parameters')
+              string(xml, attributes[:script], name: 'script')
+              string(xml, attributes[:script_language], name: 'scriptLanguage')
+            end
+          end.doc
         end
       end
     end
