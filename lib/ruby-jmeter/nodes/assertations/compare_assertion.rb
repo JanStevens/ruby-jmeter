@@ -13,7 +13,7 @@ module RubyJmeter
               long(xml, attributes[:compare_time], name: 'compareTime')
               collection(xml, name: 'stringsToSkip') do
                 Array(attributes[:strings_to_skip]).each do |skip|
-                  element(xml, elementType: 'SubstitutionElement') do
+                  element(xml, name: '', elementType: 'SubstitutionElement') do
                     string(xml, skip[:regex], name: 'regex')
                     string(xml, skip[:substitute], name: 'substitute')
                   end

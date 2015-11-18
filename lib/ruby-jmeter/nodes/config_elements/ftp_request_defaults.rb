@@ -3,21 +3,22 @@ module RubyJmeter
     module ConfigElements
       class FtpRequestDefaults < Nodes::Base
         defaults binary_mode: false, save_response: false, upload: false
-        allowed %i(server port filename local_filename input_data binary_mode save_response upload)
+        uses_new_syntax!
 
         def node
-          Nokogiri::XML(<<-XML.strip_heredoc)
-          <ConfigTestElement guiclass="FtpConfigGui" testclass="ConfigTestElement" testname="" enabled="true">
-            <stringProp name="FTPSampler.server"/>
-            <stringProp name="FTPSampler.port"/>
-            <stringProp name="FTPSampler.filename"/>
-            <stringProp name="FTPSampler.localfilename"/>
-            <stringProp name="FTPSampler.inputdata"/>
-            <boolProp name="FTPSampler.binarymode" />
-            <boolProp name="FTPSampler.saveresponse" />
-            <boolProp name="FTPSampler.upload" />
-          </ConfigTestElement>
-          XML
+          Nokogiri::XML::Builder.new do |xml|
+            xml.ConfigTestElement guiclass: "FtpConfigGui", testclass: "ConfigTestElement",
+              testname: attributes[:test_name], enabled: attributes[:enabled] do
+              string(xml, attributes[:server], name: "FTPSampler.server")
+              string(xml, attributes[:port], name: "FTPSampler.port")
+              string(xml, attributes[:filename], name: "FTPSampler.filename")
+              string(xml, attributes[:local_filename], name: "FTPSampler.localfilename")
+              string(xml, attributes[:input_data], name: "FTPSampler.inputdata")
+              bool(xml, attributes[:binary_mode], name: "FTPSampler.binarymode")
+              bool(xml, attributes[:save_response], name: "FTPSampler.saveresponse")
+              bool(xml, attributes[:upload], name: "FTPSampler.upload")
+            end
+          end.doc
         end
       end
     end
